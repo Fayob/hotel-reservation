@@ -14,8 +14,6 @@ import (
 
 const (
 	dbUri = "mongodb://localhost:27017"
-	dbName = "hotel_reservation"
-	userCollection = "users"
 )
 
 var config = fiber.Config{
@@ -39,7 +37,11 @@ func main()  {
 	apiv1 := app.Group("/api/v1")
 
 	app.Get("/", handleFoo)
-	apiv1.Get("/:id", userHandler.HandlerGetUser)
+	apiv1.Post("/user", userHandler.HandlePostUser)
+	apiv1.Get("/user", userHandler.HandlerGetUsers)
+	apiv1.Get("/user/:id", userHandler.HandlerGetUser)
+	apiv1.Delete("/user/:id", userHandler.HandleDeleteUser)
+	apiv1.Put("/user/:id", userHandler.HandleUpdateUser)
 
 	app.Listen(*listenAddr)
 }
