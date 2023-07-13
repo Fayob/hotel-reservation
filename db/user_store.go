@@ -10,11 +10,17 @@ import (
 )
 
 const (
-	DBNAME = "hotel_reservation"
+
 	userCollection = "users"
 )
 
+type Dropper interface {
+	Drop(context.Context) error
+}
+
 type UserStore interface {
+	Dropper
+
 	GetUserByID(context.Context, string) (*types.User, error)
 	GetUsers(context.Context) ([]*types.User, error)
 	CreateUser(context.Context, *types.User) (*types.User, error)
@@ -34,6 +40,9 @@ func NewMongoUserStore(client *mongo.Client) *MongoUserStore {
 	}
 }
 
+func (s *MongoUserStore) Drop(ctx context.Context) error {
+	return s.collection.Drop(ctx)
+}
 func (s *MongoUserStore) GetUserByID(ctx context.Context, id string) (*types.User, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
