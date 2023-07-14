@@ -5,6 +5,7 @@ import (
 	"flag"
 	"hotel_reservation/api"
 	"hotel_reservation/db"
+	"hotel_reservation/middleware"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -36,14 +37,18 @@ func main() {
 		}
 		userHandler  = api.NewUserHandler(userStore)
 		hotelhandler = api.NewHotelHandler(store)
+		authHandler = api.NewAuthHandler(userStore)
 		app = fiber.New(config)
-		apiv1 = app.Group("/api/v1")
+		apiv1 = app.Group("/api/v1", middleware.JWTAuthentication)
 	)
 
 	listenAddr := flag.String("listenAddr", ":5000", "This is the address the app will listen on")
 	flag.Parse()
 
 	app.Get("/", handleFoo)
+	
+	// Authentication
+	app.Post("api/auth", authHandler.HandleAuthentication)
 
 	// User Handlers
 	apiv1.Post("/user", userHandler.HandlePostUser)
