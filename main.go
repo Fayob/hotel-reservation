@@ -30,16 +30,19 @@ func main() {
 		hotelStore   = db.NewMongoHotelStore(client)
 		roomStore    = db.NewMongoRoomStore(client, hotelStore)
 		userStore = db.NewMongoUserStore(client)
+		bookingStore = db.NewMongoBookingStore(client)
 		store = &db.Store{
 			Room: roomStore,
 			Hotel: hotelStore,
 			User: userStore,
+			Booking: bookingStore,
 		}
 		userHandler  = api.NewUserHandler(userStore)
 		hotelhandler = api.NewHotelHandler(store)
 		authHandler = api.NewAuthHandler(userStore)
+		roomHandler = api.NewRoomHandler(store)
 		app = fiber.New(config)
-		apiv1 = app.Group("/api/v1", middleware.JWTAuthentication)
+		apiv1 = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
 	)
 
 	listenAddr := flag.String("listenAddr", ":5000", "This is the address the app will listen on")
@@ -61,6 +64,10 @@ func main() {
 	apiv1.Get("/hotel", hotelhandler.HandleGetHotels)
 	apiv1.Get("/hotel/:id", hotelhandler.HandleGetHotel)
 	apiv1.Get("/hotel/:id/rooms", hotelhandler.HandleGetRooms)
+
+	// Booking Handler
+	apiv1.Post("/room/:id/book", roomHandler.HandleBookRoom)
+	apiv1.Get("/room", roomHandler.HandleGetRooms)
 
 	app.Listen(*listenAddr)
 }
