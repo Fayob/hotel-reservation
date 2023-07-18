@@ -15,7 +15,7 @@ import (
 type BookRoomParams struct {
 	FromDate time.Time `json:"fromDate"`
 	TillDate time.Time `json:"tillDate"`
-	NumPersons int `json:"numPersons"`
+	NumPersons int `json:"numPerson"`
 }
 
 func (p BookRoomParams) validate() error {

@@ -41,8 +41,10 @@ func main() {
 		hotelhandler = api.NewHotelHandler(store)
 		authHandler = api.NewAuthHandler(userStore)
 		roomHandler = api.NewRoomHandler(store)
+		bookingHandler = api.NewBookingHandler(store)
 		app = fiber.New(config)
 		apiv1 = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
+		admin = apiv1.Group("/admin", middleware.AdminAuth)
 	)
 
 	listenAddr := flag.String("listenAddr", ":5000", "This is the address the app will listen on")
@@ -52,6 +54,9 @@ func main() {
 	
 	// Authentication
 	app.Post("api/auth", authHandler.HandleAuthentication)
+
+	// Admin route
+	apiv1.Post("/admin", middleware.AdminAuth)
 
 	// User Handlers
 	apiv1.Post("/user", userHandler.HandlePostUser)
@@ -65,10 +70,13 @@ func main() {
 	apiv1.Get("/hotel/:id", hotelhandler.HandleGetHotel)
 	apiv1.Get("/hotel/:id/rooms", hotelhandler.HandleGetRooms)
 
-	// Booking Handler
+	// Rooms Handler
 	apiv1.Post("/room/:id/book", roomHandler.HandleBookRoom)
 	apiv1.Get("/room", roomHandler.HandleGetRooms)
 
+	// Booking Handler
+	admin.Get("/booking", bookingHandler.HandleGetBookings)
+	apiv1.Get("/booking/:id", bookingHandler.HandleGetBooking)
 	app.Listen(*listenAddr)
 }
 

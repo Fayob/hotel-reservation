@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	bcryptCost = 12
+	bcryptCost      = 12
 	minFirstNameLen = 2
-	minLastNameLen = 2
-	minPasswordLen = 7
+	minLastNameLen  = 2
+	minPasswordLen  = 7
 )
 
 type UpdateUserParams struct {
@@ -69,10 +69,11 @@ func isEmailValid(e string) bool {
 
 type User struct {
 	ID                primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
-	FirstName         string `bson:"firstName" json:"firstName"`
-	LastName          string `bson:"lastName" json:"lastName"`
-	Email             string `bson:"email" json:"email"`
-	EncryptedPassword string `bson:"encryptedPassword" json:"-"`
+	FirstName         string             `bson:"firstName" json:"firstName"`
+	LastName          string             `bson:"lastName" json:"lastName"`
+	Email             string             `bson:"email" json:"email"`
+	EncryptedPassword string             `bson:"encryptedPassword" json:"-"`
+	IsAdmin           bool               `bson:"isAdmin" json:"isAdmin"`
 }
 
 func NewUserFromParams(params CreateUserParams) (*User, error) {
@@ -81,9 +82,9 @@ func NewUserFromParams(params CreateUserParams) (*User, error) {
 		return nil, err
 	}
 	return &User{
-		FirstName: params.FirstName,
-		LastName: params.LastName,
-		Email: params.Email,
+		FirstName:         params.FirstName,
+		LastName:          params.LastName,
+		Email:             params.Email,
 		EncryptedPassword: string(encrytpw),
 	}, nil
 }
