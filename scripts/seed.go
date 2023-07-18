@@ -18,7 +18,7 @@ var (
 	userStore *db.MongoUserStore
 )
 
-func seedUser(fname, lname, email string) {
+func seedUser(isAdmin bool, fname, lname, email string) {
 	user, err :=  types.NewUserFromParams(types.CreateUserParams{
 		Email: email,
 		FirstName: fname,
@@ -28,6 +28,7 @@ func seedUser(fname, lname, email string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	user.IsAdmin = isAdmin
 	_, err = userStore.CreateUser(context.TODO(), user)
 	if err != nil {
 		log.Fatal(err)
@@ -71,7 +72,9 @@ func main() {
 	seedHotel("Bellucia", "France", 3)
 	seedHotel("The cozy hotel", "Netherland", 4)
 	seedHotel("All king", "Lagos", 1)
-	seedUser("James", "foo", "foo@foo.com")
+	seedUser(true, "James", "Admin", "james@admin.com")
+	seedUser(false, "John", "foo", "foo@foo.com")
+	seedUser(true, "Another", "Admin", "another@admin.com")
 }
 
 func init() {
