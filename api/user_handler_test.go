@@ -73,3 +73,20 @@ func TestPostUser(t *testing.T)  {
 	}
 	fmt.Println(resp.Status)
 }
+
+// func TestGetUser(t *testing.T)  {
+// 	tdb := setup(t)
+// 	defer tdb.teardown(t)
+
+// 	app := fiber.New()
+// 	userHandler := NewUserHandler(tdb.UserStore)
+// 	app.Get("/", userHandler.HandlerGetUsers)
+
+// 	http := httptest.NewRequest("GET", "/", nil)
+// 	res, err := app.Test(http)
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+// 	var users []types.User
+// 	json.Marshal(res.Body)
+// }
