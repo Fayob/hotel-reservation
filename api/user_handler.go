@@ -84,7 +84,7 @@ func (u *UserHandler) HandlerGetUser(ctx *fiber.Ctx) error {
 func (u *UserHandler) HandlerGetUsers(ctx *fiber.Ctx) error {
 	user, err := u.userStore.GetUsers(ctx.Context())
 	if err != nil {
-		return err
+		return ErrResourceNotFound("user")
 	}
 
 	return ctx.JSON(user)
