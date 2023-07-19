@@ -36,7 +36,7 @@ func (h *HotelHandler) HandleGetHotel(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return err
+		return ErrInvalidID()
 	}
 	hotel, err := h.store.Hotel.GetHotelByID(ctx.Context(), oid)
 	if err != nil {
