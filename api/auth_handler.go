@@ -65,12 +65,12 @@ func (u *AuthHandler) HandleAuthentication(ctx *fiber.Ctx) error {
 	}
 	resp := AuthResponse{
 		User:  user,
-		Token: createToken(user),
+		Token: CreateToken(user),
 	}
 	return ctx.JSON(resp)
 }
 
-func createToken(user *types.User) string {
+func CreateToken(user *types.User) string {
 	now := time.Now()
 	expires := now.Add(time.Hour * 4).Unix()
 	claims := jwt.MapClaims{

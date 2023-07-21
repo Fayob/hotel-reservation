@@ -7,6 +7,7 @@ import (
 	"hotel_reservation/db"
 	"hotel_reservation/middleware"
 	"log"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,7 +16,11 @@ import (
 
 var config = fiber.Config{
 	ErrorHandler: func(ctx *fiber.Ctx, err error) error {
-		return ctx.JSON(map[string]string{"error": err.Error()})
+		if apiError, ok := err.(api.Error); ok {
+			return ctx.Status(apiError.Code).JSON(apiError)
+		}
+		apiError := api.NewError(http.StatusInternalServerError, err.Error())
+		return ctx.Status(apiError.Code).JSON(apiError)
 	},
 }
 
@@ -29,29 +34,29 @@ func main() {
 	var (
 		hotelStore   = db.NewMongoHotelStore(client)
 		roomStore    = db.NewMongoRoomStore(client, hotelStore)
-		userStore = db.NewMongoUserStore(client)
+		userStore    = db.NewMongoUserStore(client)
 		bookingStore = db.NewMongoBookingStore(client)
-		store = &db.Store{
-			Room: roomStore,
-			Hotel: hotelStore,
-			User: userStore,
+		store        = &db.Store{
+			Room:    roomStore,
+			Hotel:   hotelStore,
+			User:    userStore,
 			Booking: bookingStore,
 		}
-		userHandler  = api.NewUserHandler(userStore)
-		hotelhandler = api.NewHotelHandler(store)
-		authHandler = api.NewAuthHandler(userStore)
-		roomHandler = api.NewRoomHandler(store)
+		userHandler    = api.NewUserHandler(userStore)
+		hotelhandler   = api.NewHotelHandler(store)
+		authHandler    = api.NewAuthHandler(userStore)
+		roomHandler    = api.NewRoomHandler(store)
 		bookingHandler = api.NewBookingHandler(store)
-		app = fiber.New(config)
-		apiv1 = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
-		admin = apiv1.Group("/admin", middleware.AdminAuth)
+		app            = fiber.New(config)
+		apiv1          = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
+		admin          = apiv1.Group("/admin", middleware.AdminAuth)
 	)
 
 	listenAddr := flag.String("listenAddr", ":5000", "This is the address the app will listen on")
 	flag.Parse()
 
 	app.Get("/", handleFoo)
-	
+
 	// Authentication
 	app.Post("api/auth", authHandler.HandleAuthentication)
 
