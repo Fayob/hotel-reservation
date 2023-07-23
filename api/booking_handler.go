@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type BookingHandler struct {
@@ -20,7 +19,7 @@ func NewBookingHandler(store *db.Store) *BookingHandler {
 
 // This need to be admin authorized!
 func (b *BookingHandler) HandleGetBookings(ctx *fiber.Ctx) error {
-	bookings, err := b.store.Booking.GetBookings(ctx.Context(), bson.M{})
+	bookings, err := b.store.Booking.GetBookings(ctx.Context(), db.Map{})
 	if err != nil {
 		return err
 	}
@@ -43,7 +42,7 @@ func (b *BookingHandler) HandleCancelBooking(ctx *fiber.Ctx) error {
 			Msg: "not authorized",
 		})
 	}
-	if err := b.store.Booking.UpdateBooking(ctx.Context(), ctx.Params("id"), bson.M{"canceled": true}); err != nil {
+	if err := b.store.Booking.UpdateBooking(ctx.Context(), ctx.Params("id"), db.Map{"canceled": true}); err != nil {
 		return err
 	}
 	return ctx.JSON(genericResponse{Type: "msg", Msg: "Book Canceled"})

@@ -12,3 +12,7 @@ type Store struct {
 	Room  RoomStore
 	Booking BookingStore
 }
+
+type Pagination struct {
+	Page, Limit int
+}
